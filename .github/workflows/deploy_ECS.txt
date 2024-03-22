@@ -1,0 +1,39 @@
+name: Node.js Package Build & Deploy to ECS
+
+on:
+  push:
+    branches:
+      - test
+
+jobs:
+  build-and-deploy:
+    runs-on: ecs-aliyun
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - run: npm ci
+      - run: npm test
+      - name: Build Docker Image
+        run: |
+          docker build -t your-image-name:latest .
+      - name: Login to ACR (假设你已配置好阿里云容器镜像仓库)
+        env:
+          REGISTRY_USERNAME: ${{ secrets.ALIYUN_ACR_USERNAME }}
+          REGISTRY_PASSWORD: ${{ secrets.ALIYUN_ACR_PASSWORD }}
+        run: |
+          echo $REGISTRY_PASSWORD | docker login -u $REGISTRY_USERNAME --password-stdin your-acr-server-url
+      - name: Push Docker Image to ACR
+        run: docker push your-acr-server-url/your-image-name:latest
+      - name: Deploy to ECS
+        # 此处需要替换为实际部署脚本或阿里云CLI操作
+        # 假设有一个deploy.sh脚本进行远程登录和部署
+        run: |
+          chmod +x deploy.sh
+          ./deploy.sh ecs-aliyun-instance-ip 8081 your-image-name:latest
+
+# 注意：上述脚本中省略了具体如何在ECS实例上启动容器并暴露8081端口的细节，
+# 这通常涉及到阿里云ECS实例上的Docker管理以及可能的安全组规则设置。
+
+# 实际部署过程中可能还需要阿里云SDK或阿里云CLI工具配合，例如acs命令行工具等。
