@@ -1,34 +1,45 @@
 # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
 
+# 此配置文件定义了一个Node.js的持续集成（CI）工作流，它会在代码推送至master分支且提交信息包含"构建"时触发，或者通过手动触发。
 name: Node.js CI
 
 on:
-#github页面手动触发
+  # 手动触发工作流
   workflow_dispatch: 
-#打tag触发，必须是v开头的
+  # 当代码推送到指定分支且提交信息包含"构建"时触发
   push:
-    tags:
-      - "构建*.*"
+    branches:
+      - master # 监听的分支名称，可以替换为其他分支
+    if: contains(github.event.head_commit.message, '构建') # 提交信息包含"构建"时才触发
 
 jobs:
+  # 定义一个名为"build-and-deploy"的工作任务
   build-and-deploy:
+    # 指定该任务在自托管的ECS-阿里云服务器上运行
     runs-on: [self-hosted, ecs-aliyun]
 
-
+    # 使用策略来指定任务的执行方式，这里使用了矩阵策略来指定Node.js的版本
     strategy:
       matrix:
-        node-version: [16.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        node-version: [16.x] # 指定要测试的Node.js版本，支持的版本参见https://nodejs.org/en/about/releases/
 
+    # 定义该任务包含的步骤
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
+    - # 使用官方的checkout动作来检出代码
+      uses: actions/checkout@master
+    - # 设置Node.js环境，使用指定的Node.js版本
+      name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@master
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: ls -lrth
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
+        cache: 'npm' # 使用npm缓存
+    - # 列出文件目录，用于确认代码检出情况
+      run: ls -lrth
+    - # 使用npm安装依赖
+      run: npm ci
+    - # 如果存在，则运行构建命令
+      run: npm run build --if-present
+    - # 运行测试命令
+      run: npm test
+# 此处注释掉的代码应该是一个未完成的命令或者说明，具体用途不明确。
