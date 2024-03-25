@@ -4,10 +4,12 @@
 name: Node.js CI
 
 on:
+#github页面手动触发
+  workflow_dispatch: 
+#打tag触发，必须是v开头的
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+    tags:
+      - "构建*.*"
 
 jobs:
   build:
