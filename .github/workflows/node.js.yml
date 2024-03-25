@@ -11,7 +11,7 @@ on:
   push:
     branches:
       - master # 监听的分支名称，可以替换为其他分支
-    if: contains(github.event.head_commit.message, '构建') # 提交信息包含"构建"时才触发
+   # if: contains(github.event.head_commit.message, '构建') # 提交信息包含"构建"时才触发
 
 jobs:
   # 定义一个名为"build-and-deploy"的工作任务
