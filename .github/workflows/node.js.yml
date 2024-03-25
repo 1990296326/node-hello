@@ -12,9 +12,9 @@ on:
       - "构建*.*"
 
 jobs:
-  build:
+  build-and-deploy:
+    runs-on: [self-hosted, ecs-aliyun]
 
-    runs-on: ecs-aliyun
 
     strategy:
       matrix:
