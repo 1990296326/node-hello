@@ -22,10 +22,12 @@ jobs:
     # 使用策略来指定任务的执行方式，这里使用了矩阵策略来指定Node.js的版本
     strategy:
       matrix:
-        node-version: [16.x] # 指定要测试的Node.js版本，支持的版本参见https://nodejs.org/en/about/releases/
+        node-version: [16.20.2] # 指定要测试的Node.js版本，支持的版本参见https://nodejs.org/en/about/releases/
 
     # 定义该任务包含的步骤
     steps:
+    - # 列出文件目录，用于确认代码检出情况
+      run: ls -lrth
     - # 使用官方的checkout动作来检出代码
       uses: actions/checkout@master
     - # 设置Node.js环境，使用指定的Node.js版本
@@ -34,8 +36,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm' # 使用npm缓存
-    - # 列出文件目录，用于确认代码检出情况
-      run: ls -lrth
+
     - # 使用npm安装依赖
       run: npm ci
     - # 如果存在，则运行构建命令
